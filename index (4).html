@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ta" data-theme="cyan">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEON QUIZ BATTLE</title>
+<style>
+:root{--bg:#070816;--panel:rgba(16,18,43,.96);--line:#423c80;--accent:#00f7ff;--accent2:#7866e8;--good:#00ff9d;--bad:#ff477e;--text:#fff;--muted:#aaa9ce}
+html[data-theme="pink"]{--accent:#ff3df2}
+html[data-theme="green"]{--accent:#39ff88}
+html[data-theme="gold"]{--accent:#ffc400}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at top,#171342,#070816 65%)}
+.container{width:94%;max-width:760px;margin:0 auto;padding:18px 0 40px}
+.header{text-align:center;margin-bottom:18px;position:relative}
+.logo{font-size:30px;font-weight:bold;letter-spacing:3px;color:var(--accent);text-shadow:0 0 8px var(--accent),0 0 22px var(--accent2)}
+.subtitle{color:#c1baff;letter-spacing:3px;font-size:11px;margin-top:6px}
+.icon-btn{position:absolute;right:0;top:0;width:40px;height:40px;border-radius:50%;background:#202044;border:1px solid #3b4280;color:#fff;font-size:18px;cursor:pointer}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 0 18px rgba(0,247,255,.08)}
+.hidden{display:none!important}
+h2{text-align:center;margin:0 0 12px}
+.muted{color:var(--muted);font-size:13px;text-align:center;line-height:1.6}
+.card{background:#141733;border:1px solid #3b4280;border-radius:14px;padding:14px;margin:12px 0}
+.row{display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+.name-input{width:100%;padding:12px;border-radius:10px;border:1px solid #5144a8;background:#0e1030;color:#fff;font-size:16px;text-align:center}
+.name-input:focus{outline:none;border-color:var(--accent)}
+.xpbar{height:8px;background:#272747;border-radius:10px;overflow:hidden;margin-top:8px}
+.xpbar>div{height:100%;background:var(--accent);box-shadow:0 0 10px var(--accent);width:0}
+.lvl{font-weight:bold;color:var(--accent)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.grid .cat:last-child:nth-child(odd){grid-column:1/-1}
+.cat{padding:16px 8px;border-radius:12px;color:#fff;background:#141733;border:1px solid #5144a8;font-size:16px;font-weight:bold;cursor:pointer;text-align:center}
+.cat:hover{border-color:var(--accent);box-shadow:0 0 12px var(--accent2)}
+.cat .ic{font-size:26px;display:block;margin-bottom:4px}
+.cat small{display:block;color:var(--muted);font-weight:normal;font-size:11px;margin-top:5px}
+.cat em{display:block;font-style:normal;color:#ffd86b;font-size:11px;margin-top:4px}
+.btn{width:100%;border:0;padding:14px;border-radius:10px;color:#070816;background:var(--accent);font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px}
+.btn.sec{background:#25204b;color:#fff;border:1px solid var(--accent2)}
+.btn.daily{background:linear-gradient(90deg,#ff9d00,#ff3d77);color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;gap:6px;margin:6px 0 14px}
+.seg button{flex:1;padding:11px 4px;border-radius:10px;background:#151833;color:#c1baff;border:1px solid #41436e;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--accent);color:#070816;font-weight:bold;border-color:var(--accent)}
+.lab{font-size:12px;letter-spacing:2px;color:var(--muted);margin-top:8px}
+.pills{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:8px 12px;border-radius:20px;background:#202044;color:var(--accent);border:1px solid #3b4280;font-size:12px}
+.pill.danger{color:#ff6b8d;border-color:#ff477e}
+.pill.pop{transform:scale(1.15);transition:transform .15s}
+.track{height:8px;background:#272747;border-radius:10px;overflow:hidden;margin-bottom:14px}
+.bar{height:100%;width:100%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.bar.danger{background:#ff477e;box-shadow:0 0 10px #ff477e}
+.turn{text-align:center;font-weight:bold;color:#ffd86b;margin-bottom:8px}
+.streak{text-align:center;color:#ffb347;font-weight:bold;min-height:22px}
+.question{font-size:22px;line-height:1.5;margin:8px 0 18px;text-align:left}
+.answer{display:block;width:100%;text-align:left;margin:9px 0;padding:14px;color:#e8e8ff;background:#151833;border:1px solid #41436e;border-radius:10px;font-size:16px;cursor:pointer}
+.answer:hover:not(:disabled){border-color:var(--accent);background:#20264b}
+.answer.correct{background:#103b36;border-color:var(--good);color:#7dffca}
+.answer.wrong{background:#461d34;border-color:var(--bad);color:#ff9db9}
+.answer.gone{opacity:.25}
+.answer:disabled{cursor:default}
+.lifes{display:flex;gap:8px;margin-top:10px}
+.life{flex:1;padding:10px 4px;border-radius:10px;background:#25204b;color:#fff;border:1px solid var(--accent2);font-size:13px;cursor:pointer}
+.life:disabled{opacity:.35}
+.feedback{min-height:26px;text-align:center;margin:12px 0;font-weight:bold}
+.score{font-size:54px;font-weight:bold;color:var(--accent);text-shadow:0 0 15px var(--accent2);margin:6px 0;text-align:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stat{background:#141733;border:1px solid #3b4280;border-radius:12px;padding:10px 4px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--accent)}
+.stat span{font-size:11px;color:var(--muted)}
+.review{margin-top:12px;text-align:left}
+.rv{background:#151833;border-left:3px solid var(--bad);border-radius:8px;padding:10px;margin:8px 0;font-size:14px;line-height:1.5}
+.rv small{color:var(--muted);display:block}
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.badge{background:#141733;border:1px solid #3b4280;border-radius:12px;padding:10px;font-size:12px;text-align:center}
+.badge .ic{font-size:26px;display:block}
+.badge.lock{opacity:.35;filter:grayscale(1)}
+.badge.new{border-color:#ffd700;box-shadow:0 0 10px rgba(255,215,0,.4)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin:8px 0}
+.tab{flex:none;padding:8px 12px;border-radius:20px;background:#202044;color:#c1baff;border:1px solid #3b4280;font-size:12px;cursor:pointer}
+.tab.on{background:var(--accent);color:#070816;font-weight:bold;border-color:var(--accent)}
+.lb-row{display:flex;align-items:center;gap:10px;padding:11px;margin:7px 0;border-radius:10px;background:#151833;border:1px solid #41436e}
+.lb-row.t1{border-color:#ffd700}.lb-row.t2{border-color:#c0c0c0}.lb-row.t3{border-color:#cd7f32}
+.lb-row.me{background:#1d2a4a;border-color:var(--accent)}
+.lb-rank{width:34px;text-align:center;font-size:19px}
+.lb-name{flex:1;min-width:0;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-name small{display:block;color:#8d8bb5;font-weight:normal;font-size:11px;margin-top:3px}
+.lb-pts{color:var(--accent);font-weight:bold;font-size:18px;text-align:right}
+.lb-pts small{display:block;color:#8d8bb5;font-weight:normal;font-size:10px}
+.empty{text-align:center;color:#8d8bb5;padding:24px 0}
+.themes{display:flex;gap:10px;justify-content:center;margin:8px 0}
+.dot{width:34px;height:34px;border-radius:50%;border:2px solid #fff;cursor:pointer}
+.sel{width:100%;padding:12px;border-radius:10px;border:1px solid #5144a8;background:#0e1030;color:#fff;font-size:16px;margin:6px 0 14px}
+.code{font-size:48px;letter-spacing:10px;text-align:center;color:var(--accent);font-weight:bold;text-shadow:0 0 14px var(--accent2);margin:6px 0}
+.code-in{letter-spacing:8px;font-size:22px}
+.footer{text-align:center;color:#68688f;font-size:12px;margin-top:20px}
+#toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#25204b;border:1px solid var(--accent);color:#fff;padding:10px 18px;border-radius:20px;font-size:14px;z-index:20;display:none;max-width:90%;text-align:center}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:10;display:none}
+@media(max-width:500px){.logo{font-size:23px}.question{font-size:19px}.panel{padding:15px}}
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="header">
+  <div class="logo">NEON QUIZ BATTLE</div>
+  <div class="subtitle">THINK FAST • PLAY SMART • WIN BIG</div>
+  <button id="soundBtn" class="icon-btn" title="Sound">🔊</button>
+ </div>
+
+ <section id="home" class="panel screen">
+  <div class="card">
+   <input id="playerName" class="name-input" maxlength="15" placeholder="உங்கள் பெயர் / Your name" autocomplete="off">
+   <div class="row" style="margin-top:10px"><div class="lvl" id="lvlText">Lv 1</div><div class="grow" style="text-align:right;color:#aaa9ce;font-size:12px" id="xpText"></div></div>
+   <div class="xpbar"><div id="xpFill"></div></div>
+  </div>
+  <button id="dailyBtn" class="btn daily">📅 DAILY CHALLENGE</button>
+  <div class="muted" id="dailyInfo" style="margin-top:6px"></div>
+  <div class="lab">CHOOSE YOUR BATTLE</div>
+  <div class="grid" id="catGrid"></div>
+  <button id="onBtn" class="btn">🌐 ONLINE BATTLE • Friends vs Friends</button>
+  <div class="two">
+   <button id="lbBtn" class="btn sec">🏆 LEADERBOARD</button>
+   <button id="profBtn" class="btn sec">👤 PROFILE</button>
+  </div>
+ </section>
+
+ <section id="setup" class="panel screen hidden">
+  <h2 id="setupTitle"></h2>
+  <div class="lab">MODE</div><div class="seg" id="segMode"></div>
+  <div id="p2Box" class="hidden"><input id="p2Name" class="name-input" maxlength="15" placeholder="Player 2 name" style="margin-bottom:14px"></div>
+  <div class="lab">DIFFICULTY</div><div class="seg" id="segDiff"></div>
+  <div class="lab" id="sizeLab">QUESTIONS</div><div class="seg" id="segSize"></div>
+  <div class="muted" id="rulesInfo">சரியான பதில் = 10 + வேக போனஸ் (10 வரை) + தொடர் வெற்றி போனஸ், பின்னர் கடினத்தன்மை ×</div>
+  <button id="startBtn" class="btn">⚔️ START BATTLE</button>
+  <button id="setupBack" class="btn sec">⌂ BACK</button>
+ </section>
+
+ <section id="game" class="panel screen hidden">
+  <div class="pills">
+   <div id="catLabel" class="pill"></div><div id="qLabel" class="pill"></div>
+   <div id="timerLabel" class="pill"></div><div id="scoreLabel" class="pill"></div>
+  </div>
+  <div class="track"><div id="bar" class="bar"></div></div>
+  <div id="turn" class="turn"></div>
+  <div id="streak" class="streak"></div>
+  <h2 id="qText" class="question"></h2>
+  <div id="answers"></div>
+  <div class="lifes" id="lifes">
+   <button class="life" id="lifeFifty">✂️ 50:50</button>
+   <button class="life" id="lifeTime">⏱ +10s</button>
+   <button class="life" id="lifeSkip">⏭ SKIP</button>
+  </div>
+  <div id="feedback" class="feedback"></div>
+  <button id="nextBtn" class="btn hidden">NEXT ➜</button>
+  <button id="quitBtn" class="btn sec">✕ QUIT</button>
+ </section>
+
+ <section id="result" class="panel screen hidden">
+  <h2 id="resTitle"></h2>
+  <div class="score" id="resScore"></div>
+  <div class="muted" id="resMsg"></div>
+  <div class="stats" id="resStats"></div>
+  <div id="resExtra"></div>
+  <div class="review" id="review"></div>
+  <button id="againBtn" class="btn">🔄 PLAY AGAIN</button>
+  <button id="shareBtn" class="btn sec">📲 SHARE ON WHATSAPP</button>
+  <div class="two"><button id="resLb" class="btn sec">🏆 LEADERBOARD</button><button id="resHome" class="btn sec">⌂ HOME</button></div>
+ </section>
+
+ <section id="leaderboard" class="panel screen hidden">
+  <h2>🏆 LEADERBOARD</h2>
+  <div class="tabs" id="lbPeriod"></div>
+  <div class="tabs" id="lbCats"></div>
+  <div class="muted" id="lbStatus"></div>
+  <div id="lbList"></div>
+  <button id="lbHome" class="btn sec">⌂ HOME</button>
+ </section>
+
+ <section id="profile" class="panel screen hidden">
+  <h2>👤 PROFILE</h2>
+  <div class="card"><div class="row"><div class="grow"><b id="pName"></b><div class="lvl" id="pLvl"></div></div><div style="font-size:30px" id="pIcon">🎮</div></div><div class="xpbar"><div id="pXp"></div></div></div>
+  <div class="stats" id="pStats"></div>
+  <div class="lab">ACHIEVEMENTS</div><div class="badges" id="pBadges"></div>
+  <div class="lab">THEME</div><div class="themes" id="themes"></div>
+  <div class="two"><button id="vibBtn" class="btn sec"></button><button id="sndBtn2" class="btn sec"></button></div>
+  <button id="resetBtn" class="btn sec">🗑 RESET MY DATA</button>
+  <button id="profHome" class="btn sec">⌂ HOME</button>
+ </section>
+
+ <section id="online" class="panel screen hidden">
+  <h2>🌐 ONLINE BATTLE</h2>
+  <div class="muted">நண்பர்களுடன் வெவ்வேறு phone-ல் இருந்து ஒரே நேரத்தில் விளையாடலாம் (2-4 பேர்)</div>
+  <div class="card">
+   <b>➕ புதிய Room உருவாக்கு</b>
+   <select id="oCat" class="sel"></select>
+   <div class="lab">DIFFICULTY</div><div class="seg" id="oSegDiff"></div>
+   <div class="lab">QUESTIONS</div><div class="seg" id="oSegSize"></div>
+   <button id="createBtn" class="btn">🚀 CREATE ROOM</button>
+  </div>
+  <div class="card">
+   <b>🔑 Room-ல் சேர்</b>
+   <input id="joinCode" class="name-input code-in" inputmode="numeric" maxlength="4" placeholder="4-digit code" style="margin:10px 0 0">
+   <button id="joinBtn" class="btn sec">➡️ JOIN ROOM</button>
+  </div>
+  <button id="onBack" class="btn sec">⌂ BACK</button>
+ </section>
+
+ <section id="olobby" class="panel screen hidden">
+  <h2>🎮 WAITING ROOM</h2>
+  <div class="muted">இந்த code-ஐ நண்பர்களுக்கு அனுப்புங்கள்</div>
+  <div class="code" id="olCode"></div>
+  <div class="muted" id="olInfo"></div>
+  <div id="olPlayers" style="margin-top:12px"></div>
+  <button id="olShare" class="btn sec">📲 INVITE ON WHATSAPP</button>
+  <button id="olStart" class="btn">⚔️ START GAME</button>
+  <div class="muted" id="olWait"></div>
+  <button id="olLeave" class="btn sec">✕ LEAVE</button>
+ </section>
+
+ <section id="ogame" class="panel screen hidden">
+  <div class="pills">
+   <div id="ogCat" class="pill"></div><div id="ogQ" class="pill"></div>
+   <div id="ogTimer" class="pill"></div><div id="ogScore" class="pill"></div>
+  </div>
+  <div class="track"><div id="ogBar" class="bar"></div></div>
+  <h2 id="ogText" class="question"></h2>
+  <div id="ogAnswers"></div>
+  <div id="ogFb" class="feedback"></div>
+  <div class="muted" id="ogStatus"></div>
+  <div class="lab">LIVE SCOREBOARD</div>
+  <div id="ogBoard"></div>
+  <button id="ogQuit" class="btn sec">✕ LEAVE GAME</button>
+ </section>
+
+ <div class="footer">NEON QUIZ BATTLE v3 • ONLINE</div>
+</div>
+<div id="toast"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ======================================================
+   ONLINE LEADERBOARD: Firebase Realtime Database URL
+   ====================================================== */
+var DB_URL = "https://quiz-battle-abe78-default-rtdb.firebaseio.com";
+
+var QUIZ = {"Tamil":[{"q":"தமிழின் முதல் எழுத்து எது?","a":["அ","ஆ","இ","ஈ"],"c":0},{"q":"திருக்குறளை எழுதியவர் யார்?","a":["கம்பர்","திருவள்ளுவர்","பாரதியார்","அவ்வையார்"],"c":1},{"q":"தமிழில் உயிரெழுத்துகள் எத்தனை?","a":["10","12","18","216"],"c":1},{"q":"சிலப்பதிகாரத்தை எழுதியவர் யார்?","a":["இளங்கோ அடிகள்","கம்பர்","திருவள்ளுவர்","பாரதியார்"],"c":0},{"q":"தமிழ் எழுத்துகளின் மொத்த எண்ணிக்கை எவ்வளவு?","a":["216","247","30","12"],"c":1},{"q":"தமிழ்நாட்டின் தலைநகரம் எது?","a":["சென்னை","மதுரை","கோயம்புத்தூர்","திருச்சி"],"c":0},{"q":"'முப்பால்' என்று அழைக்கப்படும் நூல் எது?","a":["புறநானூறு","திருக்குறள்","நாலடியார்","கலித்தொகை"],"c":1},{"q":"தமிழில் மெய்யெழுத்துகள் எத்தனை?","a":["12","18","216","247"],"c":1},{"q":"ஆயுத எழுத்து எது?","a":["ஃ","ஔ","ங","ஞ"],"c":0},{"q":"'மகாகவி' என்று அழைக்கப்படுபவர் யார்?","a":["கண்ணதாசன்","பாரதிதாசன்","பாரதியார்","வாலி"],"c":2},{"q":"கம்பராமாயணத்தை எழுதியவர் யார்?","a":["வால்மீகி","கம்பர்","ஒட்டக்கூத்தர்","புகழேந்தி"],"c":1},{"q":"திருக்குறளில் மொத்தம் எத்தனை அதிகாரங்கள் உள்ளன?","a":["100","108","133","150"],"c":2},{"q":"திருக்குறளில் மொத்தம் எத்தனை குறட்பாக்கள் உள்ளன?","a":["1000","1330","1500","1080"],"c":1},{"q":"இன்று கிடைக்கும் மிகப் பழமையான தமிழ் இலக்கண நூல் எது?","a":["நன்னூல்","தொல்காப்பியம்","யாப்பருங்கலம்","நேமிநாதம்"],"c":1},{"q":"மணிமேகலையை எழுதியவர் யார்?","a":["இளங்கோ அடிகள்","சீத்தலைச் சாத்தனார்","திருத்தக்க தேவர்","கம்பர்"],"c":1},{"q":"'தமிழ்த் தாத்தா' என்று அழைக்கப்படுபவர் யார்?","a":["உ.வே. சாமிநாதையர்","பாரதியார்","திரு.வி.க","மறைமலை அடிகள்"],"c":0},{"q":"தமிழ்நாட்டின் மாநில மலர் எது?","a":["தாமரை","செங்காந்தள்","மல்லிகை","ரோஜா"],"c":1},{"q":"ஆத்திசூடி நூலை எழுதியவர் யார்?","a":["ஔவையார்","திருவள்ளுவர்","கம்பர்","இளங்கோ அடிகள்"],"c":0},{"q":"தமிழ்நாட்டின் மாநில விலங்கு எது?","a":["புலி","யானை","நீலகிரி வரையாடு","மான்"],"c":2},{"q":"தமிழுக்குச் செம்மொழி அந்தஸ்து எந்த ஆண்டு வழங்கப்பட்டது?","a":["1990","2004","2010","1950"],"c":1}],"Cricket":[{"q":"இந்திய கிரிக்கெட்டில் 'Captain Cool' என்று அழைக்கப்படுபவர் யார்?","a":["விராட் கோலி","எம். எஸ். தோனி","ரோஹித் சர்மா","கபில் தேவ்"],"c":1},{"q":"ஒரு கிரிக்கெட் அணியில் களத்தில் எத்தனை வீரர்கள் இருப்பார்கள்?","a":["9","10","11","12"],"c":2},{"q":"ஒரு ஓவரில் எத்தனை சட்டபூர்வ பந்துகள் வீசப்படும்?","a":["4","5","6","8"],"c":2},{"q":"ICC என்பதன் விரிவாக்கம் என்ன?","a":["International Cricket Council","Indian Cricket Club","International Cup Committee","India Cricket Council"],"c":0},{"q":"கிரிக்கெட்டில் பந்தை வீசுபவர் என்ன அழைக்கப்படுகிறார்?","a":["Batter","Bowler","Keeper","Umpire"],"c":1},{"q":"1983 உலகக் கோப்பையை வென்ற இந்திய அணியின் கேப்டன் யார்?","a":["சுனில் கவாஸ்கர்","கபில் தேவ்","எம். எஸ். தோனி","அசாருதீன்"],"c":1},{"q":"2011 உலகக் கோப்பையை வென்ற இந்திய அணியின் கேப்டன் யார்?","a":["சச்சின் டெண்டுல்கர்","சௌரவ் கங்குலி","எம். எஸ். தோனி","ராகுல் டிராவிட்"],"c":2},{"q":"'Master Blaster' என்று அழைக்கப்படுபவர் யார்?","a":["சச்சின் டெண்டுல்கர்","வீரேந்தர் சேவாக்","யுவராஜ் சிங்","விராட் கோலி"],"c":0},{"q":"கிரிக்கெட்டில் ஒரு விக்கெட்டில் எத்தனை ஸ்டம்புகள் இருக்கும்?","a":["2","3","4","5"],"c":1},{"q":"ஒரு டெஸ்ட் போட்டி அதிகபட்சம் எத்தனை நாட்கள் நடைபெறும்?","a":["3","4","5","7"],"c":2},{"q":"T20 போட்டியில் ஒரு அணிக்கு எத்தனை ஓவர்கள்?","a":["10","20","40","50"],"c":1},{"q":"ஒருநாள் (ODI) போட்டியில் ஒரு அணிக்கு எத்தனை ஓவர்கள்?","a":["20","40","50","60"],"c":2},{"q":"IPL தொடர் எந்த ஆண்டு தொடங்கியது?","a":["2005","2008","2010","2012"],"c":1},{"q":"முதல் T20 உலகக் கோப்பையை (2007) வென்ற நாடு எது?","a":["ஆஸ்திரேலியா","இந்தியா","பாகிஸ்தான்","இலங்கை"],"c":1},{"q":"கிரிக்கெட்டில் 'Duck' என்றால் என்ன?","a":["0 ரன்னில் ஆட்டமிழப்பது","சதம் அடிப்பது","ஒரு விக்கெட் எடுப்பது","ஒரு பவுண்டரி அடிப்பது"],"c":0},{"q":"பந்து தரையில் படாமல் எல்லைக்கோட்டைத் தாண்டினால் எத்தனை ரன்கள்?","a":["4","5","6","8"],"c":2},{"q":"சென்னையில் உள்ள புகழ்பெற்ற கிரிக்கெட் மைதானம் எது?","a":["ஈடன் கார்டன்ஸ்","வான்கடே","சேப்பாக்கம் (சிதம்பரம் ஸ்டேடியம்)","சின்னசாமி"],"c":2},{"q":"ஒரே பந்துவீச்சாளர் தொடர்ச்சியாக 3 பந்துகளில் 3 விக்கெட் எடுப்பது எது?","a":["ஹாட்ரிக்","மெய்டன்","டக்","யார்க்கர்"],"c":0},{"q":"ஒரு ஓவரில் எந்த ரன்னும் கொடுக்காமல் வீசினால் அது என்ன?","a":["Maiden over","No ball","Wide","Bye"],"c":0},{"q":"டெஸ்ட் கிரிக்கெட்டில் அதிக விக்கெட்டுகள் (800) எடுத்தவர் யார்?","a":["ஷேன் வார்ன்","முத்தையா முரளிதரன்","அனில் கும்ப்ளே","ஜேம்ஸ் ஆண்டர்சன்"],"c":1}],"Computer":[{"q":"CPU என்பதன் விரிவாக்கம் என்ன?","a":["Central Processing Unit","Computer Personal Unit","Central Program Utility","Control Processing User"],"c":0},{"q":"கணினியின் மூளை என்று அழைக்கப்படுவது எது?","a":["Mouse","Keyboard","CPU","Monitor"],"c":2},{"q":"HTML முக்கியமாக எதற்குப் பயன்படுகிறது?","a":["Web pages உருவாக்க","படம் எடுக்க","அச்சிட","கணினியை சார்ஜ் செய்ய"],"c":0},{"q":"Keyboard என்பது எந்த வகை சாதனம்?","a":["Output","Input","Storage","Network"],"c":1},{"q":"1 byte-ல் எத்தனை bits உள்ளன?","a":["2","4","8","16"],"c":2},{"q":"RAM என்பதன் விரிவாக்கம் என்ன?","a":["Random Access Memory","Read Applied Memory","Rapid Action Module","Real Access Machine"],"c":0},{"q":"Google Chrome என்பது எந்த வகை மென்பொருள்?","a":["Web Browser","Operating System","Antivirus","Game"],"c":0},{"q":"Windows என்பது என்ன?","a":["Operating System","Web Browser","Programming Language","Hardware"],"c":0},{"q":"Printer என்பது எந்த வகை சாதனம்?","a":["Input","Output","Storage","Processing"],"c":1},{"q":"1 KB என்பது எத்தனை bytes?","a":["100","512","1024","2048"],"c":2},{"q":"WWW என்பதன் விரிவாக்கம் என்ன?","a":["World Wide Web","World Web Work","Wide World Web","Web World Wide"],"c":0},{"q":"Ctrl + C என்ன செய்யும்?","a":["Cut","Copy","Paste","Save"],"c":1},{"q":"Ctrl + Z என்ன செய்யும்?","a":["Redo","Undo","Delete","Print"],"c":1},{"q":"Python என்பது என்ன?","a":["Programming Language","Operating System","Hard Disk","Printer"],"c":0},{"q":"Binary எண் முறையில் பயன்படும் இலக்கங்கள் எவை?","a":["0 மற்றும் 1","1 மற்றும் 2","0 முதல் 9 வரை","A மற்றும் B"],"c":0},{"q":"Hard Disk என்பது எந்த வகை சாதனம்?","a":["Storage","Input","Output","Network"],"c":0},{"q":"USB என்பதன் விரிவாக்கம் என்ன?","a":["Universal Serial Bus","United System Board","Universal Signal Box","Unique Serial Block"],"c":0},{"q":"கணினியைப் பாதிக்கும் தீங்கு விளைவிக்கும் நிரல் எது?","a":["Virus","Browser","Folder","Icon"],"c":0},{"q":"Email முகவரியில் இடம்பெறும் சிறப்புக் குறியீடு எது?","a":["#","@","&","%"],"c":1},{"q":"Wi-Fi எதற்குப் பயன்படுகிறது?","a":["கம்பியில்லா இணைய இணைப்பு","அச்சிட","ஒலி பதிவு செய்ய","கணினியை சார்ஜ் செய்ய"],"c":0}],"GK":[{"q":"இந்தியாவின் தலைநகரம் எது?","a":["புது டெல்லி","மும்பை","கொல்கத்தா","சென்னை"],"c":0},{"q":"இந்தியாவின் தேசிய விலங்கு எது?","a":["புலி","சிங்கம்","யானை","சிறுத்தை"],"c":0},{"q":"இந்தியாவின் தேசியப் பறவை எது?","a":["மயில்","கிளி","புறா","குயில்"],"c":0},{"q":"இந்தியாவின் முதல் பிரதமர் யார்?","a":["ஜவஹர்லால் நேரு","மகாத்மா காந்தி","சர்தார் வல்லபாய் படேல்","இந்திரா காந்தி"],"c":0},{"q":"இந்தியா சுதந்திரம் பெற்ற ஆண்டு எது?","a":["1947","1945","1950","1952"],"c":0},{"q":"இந்தியாவின் தேசிய மலர் எது?","a":["தாமரை","ரோஜா","மல்லிகை","சூரியகாந்தி"],"c":0},{"q":"ஜப்பானின் நாணயம் எது?","a":["யென்","டாலர்","யுவான்","வோன்"],"c":0},{"q":"தாஜ்மஹால் எந்த நகரில் உள்ளது?","a":["ஆக்ரா","டெல்லி","ஜெய்ப்பூர்","லக்னோ"],"c":0},{"q":"இந்தியாவின் முதல் குடியரசுத் தலைவர் யார்?","a":["டாக்டர் ராஜேந்திர பிரசாத்","ஏ.பி.ஜே. அப்துல் கலாம்","டாக்டர் ராதாகிருஷ்ணன்","ஜாகிர் உசேன்"],"c":0},{"q":"இந்திய அரசியலமைப்பு அமலுக்கு வந்த நாள் (குடியரசு தினம்) எது?","a":["ஜனவரி 26, 1950","ஆகஸ்ட் 15, 1947","அக்டோபர் 2, 1950","நவம்பர் 26, 1949"],"c":0},{"q":"சென்னையில் உள்ள புகழ்பெற்ற கடற்கரை எது?","a":["மெரினா","கோவளம்","ஜுஹு","கோவா பீச்"],"c":0},{"q":"'ஏவுகணை நாயகன்' என்று அழைக்கப்படுபவர் யார்?","a":["ஏ.பி.ஜே. அப்துல் கலாம்","சி.வி. ராமன்","விக்ரம் சாராபாய்","ஹோமி பாபா"],"c":0},{"q":"சந்திரயான்-3 நிலவில் தரையிறங்கிய ஆண்டு எது?","a":["2023","2019","2021","2024"],"c":0},{"q":"பரப்பளவில் இந்தியாவின் மிகப்பெரிய மாநிலம் எது?","a":["ராஜஸ்தான்","மகாராஷ்டிரா","உத்தரப் பிரதேசம்","மத்தியப் பிரதேசம்"],"c":0},{"q":"இந்தியக் கொடியில் உள்ள அசோகச் சக்கரத்தில் எத்தனை ஆரங்கள் உள்ளன?","a":["24","16","20","32"],"c":0},{"q":"உலகின் மிகச் சிறிய கண்டம் எது?","a":["ஆஸ்திரேலியா","அண்டார்டிகா","ஐரோப்பா","ஆப்பிரிக்கா"],"c":0},{"q":"இந்தியாவின் தேசிய நதி எது?","a":["கங்கை","யமுனை","காவிரி","பிரம்மபுத்திரா"],"c":0},{"q":"'தேசத் தந்தை' என்று அழைக்கப்படுபவர் யார்?","a":["மகாத்மா காந்தி","நேதாஜி","பகத் சிங்","ஜவஹர்லால் நேரு"],"c":0},{"q":"இந்தியாவின் நாணயம் எது?","a":["ரூபாய்","டாலர்","யென்","பவுண்ட்"],"c":0},{"q":"உலகின் மிக உயரமான மலைச் சிகரம் எது?","a":["எவரெஸ்ட்","கே2","கஞ்சன்ஜங்கா","அண்ணாமலை"],"c":0}],"Science":[{"q":"நீரின் வேதியியல் வாய்ப்பாடு என்ன?","a":["H2O","CO2","O2","NaCl"],"c":0},{"q":"உயிர்வாழ நமக்கு மிகவும் அவசியமான வாயு எது?","a":["ஆக்சிஜன்","நைட்ரஜன்","கார்பன் டை ஆக்சைடு","ஹைட்ரஜன்"],"c":0},{"q":"'சிவப்புக் கோள்' என்று அழைக்கப்படுவது எது?","a":["செவ்வாய்","வெள்ளி","வியாழன்","சனி"],"c":0},{"q":"வளர்ந்த மனிதனின் உடலில் எலும்புகள் எத்தனை?","a":["206","300","180","250"],"c":0},{"q":"செல்லின் 'ஆற்றல் நிலையம்' எது?","a":["மைட்டோகாண்ட்ரியா","நியூக்ளியஸ்","ரைபோசோம்","சைட்டோபிளாசம்"],"c":0},{"q":"தாவரங்கள் உணவு தயாரிக்கும் செயல் எது?","a":["ஒளிச்சேர்க்கை","சுவாசம்","ஆவியுயிர்ப்பு","செரிமானம்"],"c":0},{"q":"இயற்கையில் கிடைக்கும் மிகக் கடினமான பொருள் எது?","a":["வைரம்","தங்கம்","இரும்பு","கண்ணாடி"],"c":0},{"q":"தங்கத்தின் வேதியியல் குறியீடு என்ன?","a":["Au","Ag","Gd","Go"],"c":0},{"q":"கடல் மட்டத்தில் நீர் கொதிக்கும் வெப்பநிலை எவ்வளவு?","a":["100°C","90°C","120°C","80°C"],"c":0},{"q":"சூரியனுக்கு மிக அருகில் உள்ள கோள் எது?","a":["புதன்","வெள்ளி","பூமி","செவ்வாய்"],"c":0},{"q":"சூரிய ஒளியிலிருந்து நமக்குக் கிடைக்கும் வைட்டமின் எது?","a":["வைட்டமின் D","வைட்டமின் A","வைட்டமின் C","வைட்டமின் K"],"c":0},{"q":"புவிஈர்ப்பு விசையை விளக்கிய அறிவியலாளர் யார்?","a":["ஐசக் நியூட்டன்","ஐன்ஸ்டீன்","கலிலியோ","தாமஸ் எடிசன்"],"c":0},{"q":"நமது சூரியக் குடும்பத்தில் உள்ள கோள்கள் எத்தனை?","a":["8","9","7","10"],"c":0},{"q":"மனித இதயத்தில் எத்தனை அறைகள் உள்ளன?","a":["4","2","3","5"],"c":0},{"q":"விசையின் அலகு என்ன?","a":["நியூட்டன்","ஜூல்","வாட்","பாஸ்கல்"],"c":0},{"q":"ஒலி எதில் பயணிக்க முடியாது?","a":["வெற்றிடம்","நீர்","காற்று","இரும்பு"],"c":0},{"q":"மனித உடலின் மிகப்பெரிய உறுப்பு எது?","a":["தோல்","கல்லீரல்","இதயம்","நுரையீரல்"],"c":0},{"q":"'ராமன் விளைவு' கண்டறிந்தவர் யார்?","a":["சி.வி. ராமன்","ஜெ.சி. போஸ்","ஹோமி பாபா","சத்யேந்திர நாத் போஸ்"],"c":0},{"q":"ஒளியின் வேகம் தோராயமாக ஒரு வினாடிக்கு எவ்வளவு?","a":["3,00,000 கி.மீ","3,000 கி.மீ","30,000 கி.மீ","3 கோடி கி.மீ"],"c":0},{"q":"பூமியைச் சுற்றிவரும் இயற்கைத் துணைக்கோள் எது?","a":["சந்திரன்","செவ்வாய்","சூரியன்","வெள்ளி"],"c":0},{"q":"நமது சூரியக் குடும்பத்தின் மிகப்பெரிய கோள் எது?","a":["வியாழன்","சனி","பூமி","நெப்டியூன்"],"c":0}],"Cinema":[{"q":"'சூப்பர் ஸ்டார்' என்று அழைக்கப்படும் தமிழ் நடிகர் யார்?","a":["ரஜினிகாந்த்","கமல்ஹாசன்","விஜய்","அஜித் குமார்"],"c":0},{"q":"'உலக நாயகன்' என்று அழைக்கப்படுபவர் யார்?","a":["கமல்ஹாசன்","சூர்யா","விக்ரம்","தனுஷ்"],"c":0},{"q":"'எந்திரன்' படத்தை இயக்கியவர் யார்?","a":["ஷங்கர்","மணிரத்னம்","ஏ.ஆர். முருகதாஸ்","கே.எஸ். ரவிக்குமார்"],"c":0},{"q":"'இசைப்புயல்' என்று அழைக்கப்படும் இசையமைப்பாளர் யார்?","a":["ஏ.ஆர். ரஹ்மான்","இளையராஜா","அனிருத்","யுவன் சங்கர் ராஜா"],"c":0},{"q":"'இசைஞானி' என்று அழைக்கப்படுபவர் யார்?","a":["இளையராஜா","ஹாரிஸ் ஜெயராஜ்","தேவா","டி. இமான்"],"c":0},{"q":"'பொன்னியின் செல்வன்' நாவலை எழுதியவர் யார்?","a":["கல்கி","சுஜாதா","ஜெயகாந்தன்","அகிலன்"],"c":0},{"q":"'விக்ரம்' (2022) படத்தை இயக்கியவர் யார்?","a":["லோகேஷ் கனகராஜ்","அட்லீ","வெற்றிமாறன்","நெல்சன்"],"c":0},{"q":"'கைதி' (2019) படத்தின் கதாநாயகன் யார்?","a":["கார்த்தி","சூர்யா","சிவகார்த்திகேயன்","ஜெயம் ரவி"],"c":0},{"q":"'அசுரன்' படத்தின் கதாநாயகன் யார்?","a":["தனுஷ்","விஜய் சேதுபதி","சிம்பு","ஆர்யா"],"c":0},{"q":"தமிழின் முதல் பேசும் படம் எது?","a":["காளிதாஸ்","பராசக்தி","மனோகரா","அலிபாபாவும் 40 திருடர்களும்"],"c":0},{"q":"'நடிகர் திலகம்' என்று அழைக்கப்படுபவர் யார்?","a":["சிவாஜி கணேசன்","எம்.ஜி.ஆர்","ஜெமினி கணேசன்","எஸ்.எஸ். ராஜேந்திரன்"],"c":0},{"q":"'புரட்சித் தலைவர்' என்று அழைக்கப்பட்ட நடிகர் யார்?","a":["எம்.ஜி.ஆர்","சிவாஜி கணேசன்","ரஜினிகாந்த்","ஜெமினி கணேசன்"],"c":0},{"q":"ஏ.ஆர். ரஹ்மான் ஆஸ்கார் விருது வென்ற படம் எது?","a":["Slumdog Millionaire","Roja","Bombay","Enthiran"],"c":0},{"q":"ஏ.ஆர். ரஹ்மான் இசையமைத்த முதல் திரைப்படம் எது?","a":["ரோஜா","பம்பாய்","ஜென்டில்மேன்","முதல்வன்"],"c":0},{"q":"'ஜெய் பீம்' படத்தின் கதாநாயகன் யார்?","a":["சூர்யா","கார்த்தி","தனுஷ்","விக்ரம்"],"c":0},{"q":"தமிழ் சினிமா துறை பொதுவாக எந்தப் பெயரில் அழைக்கப்படுகிறது?","a":["கோலிவுட்","பாலிவுட்","டோலிவுட்","மாலிவுட்"],"c":0},{"q":"'96' படத்தில் த்ரிஷாவுடன் நடித்தவர் யார்?","a":["விஜய் சேதுபதி","விஜய்","ஆர்யா","சிம்பு"],"c":0},{"q":"'நாயகன்' (1987) படத்தின் இயக்குநர் யார்?","a":["மணிரத்னம்","பாரதிராஜா","கே. பாலசந்தர்","பாலா"],"c":0},{"q":"'சந்திரமுகி' படத்தில் முன்னணி வேடத்தில் நடித்தவர் யார்?","a":["ரஜினிகாந்த்","கமல்ஹாசன்","அஜித் குமார்","விஜய்"],"c":0},{"q":"'தல' என்று ரசிகர்களால் அழைக்கப்படும் நடிகர் யார்?","a":["அஜித் குமார்","விஜய்","சூர்யா","விக்ரம்"],"c":0}]};
+
+(function () {
+"use strict";
+
+var CATS = [
+ {key:"Tamil", icon:"📚", label:"Tamil", sub:"தமிழ் மொழி & இலக்கியம்"},
+ {key:"Cricket", icon:"🏏", label:"Cricket", sub:"கிரிக்கெட்"},
+ {key:"Computer", icon:"💻", label:"Computer", sub:"Tech & basics"},
+ {key:"GK", icon:"🌍", label:"General Knowledge", sub:"பொது அறிவு"},
+ {key:"Science", icon:"🔬", label:"Science", sub:"அறிவியல்"},
+ {key:"Cinema", icon:"🎬", label:"Tamil Cinema", sub:"தமிழ் சினிமா"},
+ {key:"Mix", icon:"🎲", label:"Mix Battle", sub:"எல்லா பிரிவுகளும்"}
+];
+var REAL = ["Tamil","Cricket","Computer","GK","Science","Cinema"];
+var DIFF = {easy:{secs:20,mult:1,label:"EASY"}, normal:{secs:15,mult:1.5,label:"NORMAL"}, hard:{secs:10,mult:2,label:"HARD"}};
+var TITLES = ["Rookie","Challenger","Fighter","Warrior","Champion","Master","Legend"];
+
+function $(id){return document.getElementById(id);}
+function mk(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e;}
+function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function catInfo(k){for(var i=0;i<CATS.length;i++)if(CATS[i].key===k)return CATS[i];return {key:k,icon:k==="Daily"?"📅":"🎮",label:k,sub:""};}
+function today(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+function yesterday(){var d=new Date(Date.now()-864e5);return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+function cleanName(s){return String(s||"").replace(/[<>]/g,"").replace(/^\s+|\s+$/g,"").slice(0,15);}
+
+/* ---------- state ---------- */
+var P = Object.assign({name:"",xp:0,games:0,answered:0,correct:0,points:0,bestStreak:0,fastest:99,cats:{},ach:{},dailyLast:"",dailyStreak:0,dailyScore:0,wins:0,online:0}, load("nqb_profile",{}));
+var S = Object.assign({sound:true,vibrate:true,theme:"cyan",diff:"normal",size:5,mode:"solo"}, load("nqb_settings",{}));
+if(!P.name){try{var old=localStorage.getItem("quizPlayerName");if(old)P.name=cleanName(old);}catch(e){}}
+var G=null, timerId=null, setupCat="Tamil", lastCfg=null;
+
+function saveP(){save("nqb_profile",P);}
+function saveS(){save("nqb_settings",S);}
+document.documentElement.setAttribute("data-theme",S.theme);
+
+/* ---------- level ---------- */
+function levelInfo(xp){var L=1;while(xp>=50*L*(L+1))L++;var start=50*(L-1)*L;return {level:L,cur:xp-start,need:100*L,title:TITLES[Math.min(Math.floor((L-1)/2),TITLES.length-1)]};}
+
+/* ---------- audio ---------- */
+var ac=null;
+function audio(){try{var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;if(!ac)ac=new C();if(ac.state==="suspended")ac.resume();return ac;}catch(e){return null;}}
+function tone(f,f2,d,dur,wave,vol){var a=audio();if(!a)return;var o=a.createOscillator(),g=a.createGain(),t=a.currentTime+d;o.type=wave;o.frequency.setValueAtTime(f,t);if(f2!==f)o.frequency.linearRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.05);}
+function sfx(type){if(!S.sound)return;try{
+ if(type==="correct"){tone(784,784,0,.18,"triangle",.45);tone(1047,1047,.13,.22,"triangle",.45);tone(1568,1568,.26,.35,"sine",.35);}
+ else if(type==="wrong"){tone(200,120,0,.28,"sawtooth",.35);tone(160,90,.25,.4,"sawtooth",.35);}
+ else if(type==="win"||type==="levelup"){[523,659,784,1047,1319].forEach(function(f,i){tone(f,f,i*.13,.25,"triangle",.45);});}
+ else if(type==="tick"){tone(900,900,0,.06,"square",.12);}
+ else if(type==="life"){tone(600,1200,0,.2,"sine",.35);}
+ else if(type==="click"){tone(700,700,0,.05,"sine",.2);}
+}catch(e){}}
+function buzz(p){if(S.vibrate&&navigator.vibrate){try{navigator.vibrate(p);}catch(e){}}}
+document.addEventListener("pointerdown",function(){audio();},{once:true});
+
+function toast(msg){var t=$("toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(function(){t.style.display="none";},2600);}
+
+/* ---------- screens ---------- */
+function show(id){var s=document.querySelectorAll(".screen");for(var i=0;i<s.length;i++)s[i].classList.add("hidden");$(id).classList.remove("hidden");window.scrollTo(0,0);}
+
+/* ---------- random / questions ---------- */
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hash(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function shuffle(a,r){r=r||Math.random;for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function poolFor(cat){var keys=cat==="Mix"?REAL:[cat],out=[];keys.forEach(function(k){QUIZ[k].forEach(function(x,i){out.push({id:k+":"+i,cat:k,x:x});});});return out;}
+function prep(it,r){var o=it.x.a.map(function(t,i){return {t:t,ok:i===it.x.c};});shuffle(o,r);return {q:it.x.q,cat:it.cat,opts:o,answer:it.x.a[it.x.c]};}
+function pick(cat,n){return pickItems(cat,n).map(function(c){return prep(c);});}
+function pickItems(cat,n){
+ var pool=poolFor(cat);n=Math.min(n,pool.length);
+ var used=load("nqb_used",[]),set={};used.forEach(function(u){set[u]=1;});
+ var fresh=pool.filter(function(p){return !set[p.id];});
+ if(fresh.length<n){var ids={};pool.forEach(function(p){ids[p.id]=1;});used=used.filter(function(u){return !ids[u];});fresh=pool.slice();}
+ shuffle(fresh);var ch=fresh.slice(0,n);ch.forEach(function(c){used.push(c.id);});save("nqb_used",used);
+ return ch;
+}
+function dailyQs(){var r=mulberry(hash("daily-"+today()));var p=poolFor("Mix");shuffle(p,r);return p.slice(0,5).map(function(c){return prep(c,r);});}
+
+/* ---------- home ---------- */
+function renderHome(){
+ $("playerName").value=P.name;
+ var li=levelInfo(P.xp);
+ $("lvlText").textContent="Lv "+li.level+" • "+li.title;
+ $("xpText").textContent=li.cur+" / "+li.need+" XP";
+ $("xpFill").style.width=Math.min(100,li.cur/li.need*100)+"%";
+ var done=P.dailyLast===today();
+ $("dailyBtn").disabled=done;
+ $("dailyBtn").textContent=done?"✅ DAILY DONE ("+P.dailyScore+" pts)":"📅 DAILY CHALLENGE • ×2 POINTS";
+ $("dailyInfo").textContent=(P.dailyStreak>0&&(P.dailyLast===today()||P.dailyLast===yesterday())?"🔥 Daily streak: "+P.dailyStreak+" நாள் • ":"")+"தினமும் ஒரு புதிய சவால் (5 கேள்விகள்)";
+ var g=$("catGrid");g.innerHTML="";
+ CATS.forEach(function(c){
+  var b=mk("button","cat");b.appendChild(mk("span","ic",c.icon));b.appendChild(document.createTextNode(c.label));b.appendChild(mk("small","",c.sub));
+  var best=P.cats[c.key]&&P.cats[c.key].best;if(best)b.appendChild(mk("em","","🏆 Best: "+best));
+  b.onclick=function(){sfx("click");openSetup(c.key);};g.appendChild(b);
+ });
+ $("soundBtn").textContent=S.sound?"🔊":"🔇";
+}
+$("playerName").addEventListener("input",function(){P.name=cleanName(this.value);saveP();});
+$("soundBtn").onclick=function(){S.sound=!S.sound;saveS();$("soundBtn").textContent=S.sound?"🔊":"🔇";sfx("click");};
+$("lbBtn").onclick=function(){showLb("All");};
+$("profBtn").onclick=function(){renderProfile();show("profile");};
+$("dailyBtn").onclick=function(){startGame({mode:"daily",cat:"Mix",diff:"normal",size:5});};
+
+/* ---------- setup ---------- */
+function seg(id,opts,cur,fn){var c=$(id);c.innerHTML="";opts.forEach(function(o){var b=mk("button",o.v===cur?"on":"",o.t);b.onclick=function(){fn(o.v);};c.appendChild(b);});}
+function openSetup(cat){setupCat=cat;renderSetup();show("setup");}
+function renderSetup(){
+ var c=catInfo(setupCat);$("setupTitle").textContent=c.icon+" "+c.label;
+ seg("segMode",[{v:"solo",t:"👤 Solo"},{v:"duo",t:"👥 2 Players"}],S.mode,function(v){S.mode=v;saveS();renderSetup();});
+ seg("segDiff",[{v:"easy",t:"😊 Easy 20s ×1"},{v:"normal",t:"⚡ Normal 15s ×1.5"},{v:"hard",t:"💀 Hard 10s ×2"}],S.diff,function(v){S.diff=v;saveS();renderSetup();});
+ seg("segSize",[{v:5,t:"5"},{v:10,t:"10"},{v:15,t:"15"}],S.size,function(v){S.size=v;saveS();renderSetup();});
+ $("sizeLab").textContent=S.mode==="duo"?"QUESTIONS PER PLAYER":"QUESTIONS";
+ $("p2Box").classList.toggle("hidden",S.mode!=="duo");
+}
+$("setupBack").onclick=function(){renderHome();show("home");};
+$("startBtn").onclick=function(){startGame({mode:S.mode,cat:setupCat,diff:S.diff,size:S.size,p2:cleanName($("p2Name").value)||"Player 2"});};
+
+/* ---------- game ---------- */
+function startGame(cfg){
+ audio();lastCfg=cfg;
+ var qs,mult=DIFF[cfg.diff].mult;
+ if(cfg.mode==="daily"){qs=dailyQs();mult*=2;}
+ else if(cfg.mode==="duo"){var n=Math.min(cfg.size*2,poolFor(cfg.cat).length);n-=n%2;qs=pick(cfg.cat,n);}
+ else qs=pick(cfg.cat,cfg.size);
+ var p1=cleanName(P.name)||"Player";
+ var players=[{name:p1,score:0,correct:0,streak:0,best:0}];
+ if(cfg.mode==="duo")players.push({name:cfg.p2,score:0,correct:0,streak:0,best:0});
+ G={cfg:cfg,qs:qs,idx:0,turn:0,players:players,secs:DIFF[cfg.diff].secs,mult:mult,answered:false,startTs:0,extra:0,
+    life:{fifty:true,time:true,skip:true},usedLife:false,wrongs:[],skipped:0,fastest:99,lastTick:-1};
+ $("catLabel").textContent=cfg.mode==="daily"?"📅 DAILY":catInfo(cfg.cat).icon+" "+catInfo(cfg.cat).label.toUpperCase();
+ $("lifes").classList.toggle("hidden",cfg.mode==="duo");
+ show("game");showQ();
+}
+function remaining(){return G.secs+G.extra-(Date.now()-G.startTs)/1000;}
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
+function hud(){
+ $("qLabel").textContent="Q "+(G.idx+1)+" / "+G.qs.length;
+ $("scoreLabel").textContent=G.players.length>1?G.players[0].name.slice(0,6)+" "+G.players[0].score+" • "+G.players[1].name.slice(0,6)+" "+G.players[1].score:"SCORE: "+G.players[0].score;
+ var pl=G.players[G.turn];$("streak").textContent=pl.streak>=2?"🔥 STREAK x"+pl.streak:"";
+}
+function showQ(){
+ stopTimer();G.answered=false;G.extra=0;G.startTs=Date.now();G.lastTick=-1;
+ var q=G.qs[G.idx];
+ $("qText").textContent=q.q;$("feedback").textContent="";$("nextBtn").classList.add("hidden");$("quitBtn").classList.remove("hidden");
+ $("turn").textContent=G.players.length>1?"🎮 "+G.players[G.turn].name+" — உங்கள் முறை!":"";
+ var a=$("answers");a.innerHTML="";
+ q.opts.forEach(function(o,i){var b=mk("button","answer",String.fromCharCode(65+i)+". "+o.t);b.onclick=function(){answer(i);};a.appendChild(b);});
+ $("lifeFifty").disabled=!G.life.fifty;$("lifeTime").disabled=!G.life.time;$("lifeSkip").disabled=!G.life.skip;
+ hud();tick();timerId=setInterval(tick,100);
+}
+function tick(){
+ var r=remaining();var tl=Math.max(0,Math.ceil(r));
+ $("timerLabel").textContent="⏱ "+tl+"s";$("timerLabel").classList.toggle("danger",r<=5);
+ var b=$("bar");b.style.width=Math.max(0,Math.min(100,r/(G.secs+G.extra)*100))+"%";b.classList.toggle("danger",r<=5);
+ if(r<=3&&r>0&&tl!==G.lastTick){G.lastTick=tl;sfx("tick");}
+ if(r<=0&&!G.answered)timeUp();
+}
+function btns(){return $("answers").getElementsByTagName("button");}
+function pop(){var s=$("scoreLabel");s.classList.add("pop");setTimeout(function(){s.classList.remove("pop");},200);}
+function fb(msg,col){var f=$("feedback");f.textContent=msg;f.style.color=col;}
+function finishQ(){hud();$("quitBtn").classList.add("hidden");var n=$("nextBtn");n.textContent=G.idx===G.qs.length-1?"VIEW RESULT 🏆":"NEXT ➜";n.classList.remove("hidden");}
+function answer(i){
+ if(G.answered)return;G.answered=true;stopTimer();
+ var q=G.qs[G.idx],pl=G.players[G.turn],bs=btns(),rem=remaining(),el=(Date.now()-G.startTs)/1000;
+ for(var k=0;k<bs.length;k++){bs[k].disabled=true;if(q.opts[k].ok)bs[k].classList.add("correct");}
+ if(q.opts[i].ok){
+  pl.streak++;if(pl.streak>pl.best)pl.best=pl.streak;
+  var speed=Math.round(Math.max(0,Math.min(1,rem/G.secs))*10),sb=pl.streak>=2?Math.min(pl.streak-1,5)*2:0;
+  var gain=Math.round((10+speed+sb)*G.mult);pl.score+=gain;pl.correct++;if(el<G.fastest)G.fastest=el;
+  fb("⚡ CORRECT! +"+gain+(pl.streak>=2?"  🔥 x"+pl.streak:""),"#00ffad");sfx("correct");pop();
+ } else {
+  bs[i].classList.add("wrong");pl.streak=0;
+  G.wrongs.push({q:q.q,yours:q.opts[i].t,right:q.answer,who:pl.name});
+  fb("✖ WRONG! Answer: "+q.answer,"#ff789d");sfx("wrong");buzz(200);
+ }
+ finishQ();
+}
+function timeUp(){
+ G.answered=true;stopTimer();
+ var q=G.qs[G.idx],pl=G.players[G.turn],bs=btns();
+ for(var k=0;k<bs.length;k++){bs[k].disabled=true;if(q.opts[k].ok)bs[k].classList.add("correct");}
+ pl.streak=0;G.wrongs.push({q:q.q,yours:"⏰ Time up",right:q.answer,who:pl.name});
+ fb("⏰ TIME UP! Answer: "+q.answer,"#ff789d");sfx("wrong");buzz(200);finishQ();
+}
+$("lifeFifty").onclick=function(){
+ if(G.answered||!G.life.fifty)return;G.life.fifty=false;G.usedLife=true;
+ var q=G.qs[G.idx],bs=btns(),wrong=[];
+ for(var k=0;k<bs.length;k++)if(!q.opts[k].ok)wrong.push(k);
+ shuffle(wrong);wrong.slice(0,2).forEach(function(k){bs[k].disabled=true;bs[k].classList.add("gone");});
+ $("lifeFifty").disabled=true;sfx("life");
+};
+$("lifeTime").onclick=function(){if(G.answered||!G.life.time)return;G.life.time=false;G.usedLife=true;G.extra+=10;$("lifeTime").disabled=true;sfx("life");toast("⏱ +10 seconds!");};
+$("lifeSkip").onclick=function(){
+ if(G.answered||!G.life.skip)return;G.life.skip=false;G.usedLife=true;G.answered=true;stopTimer();G.skipped++;
+ var q=G.qs[G.idx];G.wrongs.push({q:q.q,yours:"⏭ Skipped",right:q.answer,who:G.players[G.turn].name});
+ sfx("life");next();
+};
+function next(){
+ if(G.idx<G.qs.length-1){G.idx++;if(G.players.length>1)G.turn=G.idx%2;showQ();}else finish();
+}
+$("nextBtn").onclick=function(){if(G.answered)next();};
+$("quitBtn").onclick=function(){if(window.confirm("Game-ஐ விட்டு வெளியேறவா? (மதிப்பெண் சேமிக்கப்படாது)")){stopTimer();G=null;renderHome();show("home");}};
+document.addEventListener("keydown",function(e){
+ if($("game").classList.contains("hidden")||!G)return;
+ var n=parseInt(e.key,10);if(n>=1&&n<=4&&!G.answered){var b=btns()[n-1];if(b&&!b.disabled)answer(n-1);}
+ else if((e.key==="Enter"||e.key===" ")&&G.answered&&!$("nextBtn").classList.contains("hidden")){e.preventDefault();next();}
+});
+
+/* ---------- achievements ---------- */
+var ACH=[
+ {id:"first",icon:"🎮",name:"First Battle",desc:"முதல் game முடித்தல்",t:function(p,g){return p.games>=1;}},
+ {id:"perfect",icon:"🏆",name:"Perfectionist",desc:"100% மதிப்பெண் (5+ கேள்வி)",t:function(p,g){return g.correct===g.total&&g.total>=5;}},
+ {id:"s5",icon:"🔥",name:"On Fire",desc:"5 தொடர் சரியான பதில்கள்",t:function(p){return p.bestStreak>=5;}},
+ {id:"s10",icon:"⚡",name:"Unstoppable",desc:"10 தொடர் சரியான பதில்கள்",t:function(p){return p.bestStreak>=10;}},
+ {id:"speed",icon:"💨",name:"Lightning",desc:"2 விநாடிக்குள் சரியாக பதில்",t:function(p){return p.fastest<=2;}},
+ {id:"g10",icon:"🎖️",name:"Veteran",desc:"10 games விளையாடுதல்",t:function(p){return p.games>=10;}},
+ {id:"explore",icon:"🧭",name:"Explorer",desc:"6 பிரிவுகளையும் விளையாடுதல்",t:function(p){return REAL.every(function(k){return p.cats[k];});}},
+ {id:"hard",icon:"💀",name:"Hard Hero",desc:"Hard-ல் 80%+",t:function(p,g){return g.diff==="hard"&&g.correct/g.total>=.8;}},
+ {id:"daily3",icon:"📅",name:"Daily Habit",desc:"3 நாள் தொடர்ந்து Daily",t:function(p){return p.dailyStreak>=3;}},
+ {id:"k",icon:"💎",name:"Point Collector",desc:"மொத்தம் 1000 புள்ளிகள்",t:function(p){return p.points>=1000;}},
+ {id:"brain",icon:"🧠",name:"Pure Brain",desc:"Lifeline இல்லாமல் 100%",t:function(p,g){return g.correct===g.total&&!g.usedLife&&g.total>=5;}}
+];
+
+/* ---------- finish ---------- */
+var lastResult=null;
+function finish(){
+ stopTimer();
+ var duo=G.players.length>1,pl=G.players[0],total=G.qs.length,cfg=G.cfg;
+ var key=cfg.mode==="daily"?"Daily":cfg.cat;
+ $("resExtra").innerHTML="";$("review").innerHTML="";$("resStats").innerHTML="";
+ var st=$("resStats");
+ function stat(v,l){var d=mk("div","stat");d.appendChild(mk("b","",v));d.appendChild(mk("span","",l));st.appendChild(d);}
+ if(duo){
+  var a=G.players[0],b=G.players[1];
+  $("resTitle").textContent=a.score===b.score?"🤝 DRAW!":"🏆 "+(a.score>b.score?a:b).name+" WINS!";
+  $("resScore").textContent=a.score+" : "+b.score;
+  $("resMsg").textContent=a.name+" "+a.correct+"/"+(total/2)+" சரி • "+b.name+" "+b.correct+"/"+(total/2)+" சரி";
+  stat(a.score,a.name);stat(b.score,b.name);stat(Math.max(a.best,b.best),"Best streak");
+  lastResult={text:"⚔️ NEON QUIZ BATTLE\n"+a.name+" "+a.score+" : "+b.score+" "+b.name+"\nCan you beat us?"};
+  sfx("win");
+ } else {
+  var acc=Math.round(pl.correct/total*100),levelBefore=levelInfo(P.xp).level;
+  P.games++;P.answered+=total;P.correct+=pl.correct;P.points+=pl.score;P.xp+=pl.score;
+  if(pl.best>P.bestStreak)P.bestStreak=pl.best;if(G.fastest<P.fastest)P.fastest=G.fastest;
+  var c=P.cats[key]||{games:0,best:0};c.games++;if(pl.score>c.best)c.best=pl.score;P.cats[key]=c;
+  if(cfg.mode==="daily"){P.dailyStreak=P.dailyLast===yesterday()?P.dailyStreak+1:1;P.dailyLast=today();P.dailyScore=pl.score;}
+  var g={correct:pl.correct,total:total,diff:cfg.diff,usedLife:G.usedLife},fresh=[];
+  ACH.forEach(function(x){if(!P.ach[x.id]&&x.t(P,g)){P.ach[x.id]=today();fresh.push(x);}});
+  saveP();
+  var levelAfter=levelInfo(P.xp).level;
+  $("resTitle").textContent=acc===100?"🏆 PERFECT VICTORY!":acc>=60?"⚡ GREAT BATTLE!":"🎮 KEEP TRAINING!";
+  $("resScore").textContent=pl.correct+" / "+total;
+  $("resMsg").textContent="⭐ "+pl.score+" POINTS • "+DIFF[cfg.diff].label+(cfg.mode==="daily"?" • DAILY ×2":"");
+  stat(acc+"%","Accuracy");stat(pl.best,"Best streak");stat("+"+pl.score,"XP");
+  if(levelAfter>levelBefore){var lu=mk("div","card","🎉 LEVEL UP! இப்போது Level "+levelAfter+" • "+levelInfo(P.xp).title);lu.style.textAlign="center";lu.style.color="#ffd86b";$("resExtra").appendChild(lu);}
+  if(fresh.length){var bw=mk("div","badges");fresh.forEach(function(x){var d=mk("div","badge new");d.appendChild(mk("span","ic",x.icon));d.appendChild(mk("b","",x.name));d.appendChild(mk("div","",x.desc));bw.appendChild(d);});$("resExtra").appendChild(mk("div","lab","🏅 NEW BADGES"));$("resExtra").appendChild(bw);}
+  pushScore({name:cleanName(P.name)||"Player",cat:key,correct:pl.correct,total:total,points:pl.score,diff:cfg.diff,mode:cfg.mode,date:Date.now()});
+  lastResult={text:"🎮 NEON QUIZ BATTLE\n"+(cleanName(P.name)||"I")+" scored "+pl.score+" points ("+pl.correct+"/"+total+") in "+catInfo(key).label+" on "+DIFF[cfg.diff].label+"!\nCan you beat me?"};
+  if(acc>=80){sfx("win");confetti();}else sfx(acc>=40?"correct":"wrong");
+  if(levelAfter>levelBefore)setTimeout(function(){sfx("levelup");},900);
+ }
+ if(G.wrongs.length){
+  $("review").appendChild(mk("div","lab","📝 REVIEW ("+G.wrongs.length+")"));
+  G.wrongs.forEach(function(w){var d=mk("div","rv",w.q);d.appendChild(mk("small","",(duo?w.who+": ":"")+"நீங்கள்: "+w.yours));d.appendChild(mk("small","","✔ சரியான பதில்: "+w.right));$("review").appendChild(d);});
+ }
+ $("againBtn").classList.toggle("hidden",cfg.mode==="daily");
+ show("result");
+}
+$("againBtn").onclick=function(){startGame(lastCfg);};
+$("resHome").onclick=function(){renderHome();show("home");};
+$("resLb").onclick=function(){showLb(lastCfg&&lastCfg.mode==="daily"?"Daily":(lastCfg&&lastCfg.cat)||"All");};
+$("shareBtn").onclick=function(){
+ var url=location.href.split("#")[0],text=(lastResult?lastResult.text:"NEON QUIZ BATTLE")+"\n"+url;
+ if(navigator.share){navigator.share({text:text}).catch(function(){});}
+ else window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");
+};
+
+/* ---------- confetti ---------- */
+function confetti(){
+ var c=$("confetti"),x=c.getContext("2d");c.width=window.innerWidth;c.height=window.innerHeight;c.style.display="block";
+ var cols=["#00f7ff","#ff3df2","#ffd700","#39ff88","#7866e8"],ps=[];
+ for(var i=0;i<120;i++)ps.push({x:Math.random()*c.width,y:-Math.random()*c.height*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:4+Math.random()*6,c:cols[i%5],r:Math.random()*6});
+ var t0=Date.now();
+ (function f(){x.clearRect(0,0,c.width,c.height);ps.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.r+=.1;x.fillStyle=p.c;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore();});
+  if(Date.now()-t0<3000)requestAnimationFrame(f);else{x.clearRect(0,0,c.width,c.height);c.style.display="none";}})();
+}
+
+/* ---------- leaderboard ---------- */
+function localBoard(){return load("nqb_board",[]);}
+function pushScore(e){
+ var b=localBoard();b.push(e);b.sort(function(a,c){return c.points-a.points;});save("nqb_board",b.slice(0,200));
+ if(DB_URL){try{fetch(DB_URL+"/scores.json",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(e)}).catch(function(){});}catch(x){}}
+}
+function loadBoard(cb){
+ if(!DB_URL){cb(localBoard(),"local");return;}
+ fetch(DB_URL+"/scores.json?orderBy="+encodeURIComponent('"$key"')+"&limitToLast=500")
+  .then(function(r){if(!r.ok)throw new Error("bad");return r.json();})
+  .then(function(d){var rows=[];if(d)for(var k in d){var v=d[k];if(v&&typeof v.points==="number"&&v.points>=0&&v.points<=3000&&v.total>=1&&v.correct<=v.total)rows.push(v);}cb(rows,"online");})
+  .catch(function(){cb(localBoard(),"offline");});
+}
+var lbPeriod="all";
+function showLb(cat){
+ show("leaderboard");
+ var pt=$("lbPeriod");pt.innerHTML="";
+ [["today","📆 Today"],["week","🗓 This Week"],["all","⭐ All Time"]].forEach(function(p){var b=mk("button","tab"+(lbPeriod===p[0]?" on":""),p[1]);b.onclick=function(){lbPeriod=p[0];showLb(cat);};pt.appendChild(b);});
+ var ct=$("lbCats");ct.innerHTML="";
+ ["All"].concat(REAL,["Mix","Daily"]).forEach(function(k){var b=mk("button","tab"+(k===cat?" on":""),k==="All"?"ALL":catInfo(k).label.toUpperCase());b.onclick=function(){showLb(k);};ct.appendChild(b);});
+ var st=$("lbStatus"),list=$("lbList");list.innerHTML="";st.textContent=DB_URL?"⏳ Loading...":"";
+ loadBoard(function(rows,mode){
+  st.textContent=mode==="online"?"🌐 எல்லா வீரர்களும் • ஒவ்வொருவரின் சிறந்த மதிப்பெண்":mode==="offline"?"⚠️ இணையம்/Database இணைக்க முடியவில்லை — இந்த சாதனத்தின் மதிப்பெண்கள்":"📱 இந்த சாதனத்தின் மதிப்பெண்கள் மட்டும்";
+  var now=Date.now(),d0=new Date();d0.setHours(0,0,0,0);
+  var minT=lbPeriod==="today"?d0.getTime():lbPeriod==="week"?now-7*864e5:0;
+  var best={};
+  rows.forEach(function(r){if((cat!=="All"&&r.cat!==cat)||r.date<minT)return;var k=String(r.name||"Player").toLowerCase();if(!best[k]||r.points>best[k].points)best[k]=r;});
+  var arr=Object.keys(best).map(function(k){return best[k];}).sort(function(a,b){return b.points-a.points||a.date-b.date;}).slice(0,25);
+  if(!arr.length){list.appendChild(mk("div","empty","இன்னும் யாரும் விளையாடவில்லை. முதல் ஆளாக வாருங்கள்! 🎮"));return;}
+  var me=(cleanName(P.name)||"").toLowerCase(),med=["🥇","🥈","🥉"];
+  arr.forEach(function(r,i){
+   var row=mk("div","lb-row"+(i<3?" t"+(i+1):"")+(me&&String(r.name).toLowerCase()===me?" me":""));
+   row.appendChild(mk("div","lb-rank",i<3?med[i]:String(i+1)));
+   var n=mk("div","lb-name",String(r.name||"Player").slice(0,15));
+   var dd=new Date(r.date);n.appendChild(mk("small","",catInfo(r.cat).label+" • "+r.correct+"/"+r.total+" • "+(DIFF[r.diff]?DIFF[r.diff].label:"")+" • "+dd.toLocaleDateString()));
+   var p=mk("div","lb-pts",String(r.points));p.appendChild(mk("small","","points"));
+   row.appendChild(n);row.appendChild(p);list.appendChild(row);
+  });
+ });
+}
+$("lbHome").onclick=function(){renderHome();show("home");};
+
+/* ---------- profile ---------- */
+function renderProfile(){
+ var li=levelInfo(P.xp);
+ $("pName").textContent=cleanName(P.name)||"Player";$("pLvl").textContent="Level "+li.level+" • "+li.title+" • "+li.cur+"/"+li.need+" XP";
+ $("pXp").style.width=Math.min(100,li.cur/li.need*100)+"%";
+ var st=$("pStats");st.innerHTML="";
+ [[P.games,"Games"],[P.answered?Math.round(P.correct/P.answered*100)+"%":"–","Accuracy"],[P.points,"Total pts"],[P.bestStreak,"Best streak"],[P.correct,"Correct"],[P.dailyStreak,"Daily streak"]].forEach(function(s){var d=mk("div","stat");d.appendChild(mk("b","",String(s[0])));d.appendChild(mk("span","",s[1]));st.appendChild(d);});
+ var bw=$("pBadges");bw.innerHTML="";
+ ACH.forEach(function(a){var d=mk("div","badge"+(P.ach[a.id]?"":" lock"));d.appendChild(mk("span","ic",a.icon));d.appendChild(mk("b","",a.name));d.appendChild(mk("div","",a.desc));bw.appendChild(d);});
+ var th=$("themes");th.innerHTML="";
+ [["cyan","#00f7ff"],["pink","#ff3df2"],["green","#39ff88"],["gold","#ffc400"]].forEach(function(t){var d=mk("div","dot");d.style.background=t[1];if(S.theme===t[0])d.style.boxShadow="0 0 12px "+t[1];d.onclick=function(){S.theme=t[0];saveS();document.documentElement.setAttribute("data-theme",t[0]);renderProfile();};th.appendChild(d);});
+ $("vibBtn").textContent=S.vibrate?"📳 Vibration: ON":"📴 Vibration: OFF";
+ $("sndBtn2").textContent=S.sound?"🔊 Sound: ON":"🔇 Sound: OFF";
+}
+$("vibBtn").onclick=function(){S.vibrate=!S.vibrate;saveS();renderProfile();};
+$("sndBtn2").onclick=function(){S.sound=!S.sound;saveS();renderProfile();sfx("click");};
+$("resetBtn").onclick=function(){if(window.confirm("உங்கள் எல்லா தரவையும் (level, badges, scores) அழிக்கவா?")){["nqb_profile","nqb_settings","nqb_used","nqb_board"].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});location.reload();}};
+$("profHome").onclick=function(){renderHome();show("home");};
+
+/* ---------- ONLINE BATTLE (Firebase Realtime Database, polling) ---------- */
+var O=null,oPoll=null,oTick=null,oBusy=false;
+function myName(){return cleanName(P.name)||"Player";}
+function newPid(){return "p"+Math.random().toString(36).slice(2,9);}
+function dbReq(method,path,body){
+ var o={method:method};
+ if(body!==undefined){o.headers={"Content-Type":"application/json"};o.body=JSON.stringify(body);}
+ return fetch(DB_URL+path+".json?_="+Date.now(),o).then(function(r){if(!r.ok)throw new Error("db "+r.status);return r.json();});
+}
+function openOnline(){
+ if(!DB_URL){toast("Online-க்கு DB_URL தேவை");return;}
+ var sel=$("oCat");
+ if(!sel.options.length)CATS.forEach(function(c){var o=document.createElement("option");o.value=c.key;o.textContent=c.icon+" "+c.label;sel.appendChild(o);});
+ renderOnlineMenu();show("online");
+}
+function renderOnlineMenu(){
+ seg("oSegDiff",[{v:"easy",t:"😊 Easy"},{v:"normal",t:"⚡ Normal"},{v:"hard",t:"💀 Hard"}],S.diff,function(v){S.diff=v;saveS();renderOnlineMenu();});
+ seg("oSegSize",[{v:5,t:"5"},{v:10,t:"10"},{v:15,t:"15"}],S.size,function(v){S.size=v;saveS();renderOnlineMenu();});
+}
+$("onBtn").onclick=function(){sfx("click");openOnline();};
+$("onBack").onclick=function(){renderHome();show("home");};
+$("joinCode").addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").slice(0,4);});
+
+function createRoom(tries){
+ tries=tries||0;if(tries>5){toast("மீண்டும் முயற்சிக்கவும்");return;}
+ var code=String(1000+Math.floor(Math.random()*9000));
+ dbReq("GET","/rooms/"+code).then(function(ex){
+  if(ex)return createRoom(tries+1);
+  var pid=newPid(),room={host:pid,cat:$("oCat").value,diff:S.diff,size:S.size,status:"lobby",q:0,created:Date.now(),players:{}};
+  room.players[pid]={name:myName(),joined:Date.now()};
+  return dbReq("PUT","/rooms/"+code,room).then(function(){enterRoom(code,pid,true);});
+ }).catch(function(){toast("Room உருவாக்க முடியவில்லை. Internet / Firebase Rules சரிபார்க்கவும்");});
+}
+function joinRoom(code){
+ if(!/^\d{4}$/.test(code)){toast("4 இலக்க code உள்ளிடவும்");return;}
+ dbReq("GET","/rooms/"+code).then(function(r){
+  if(!r){toast("Room கிடைக்கவில்லை");return;}
+  if(r.status!=="lobby"){toast("ஆட்டம் ஏற்கனவே தொடங்கிவிட்டது");return;}
+  if(Object.keys(r.players||{}).length>=4){toast("Room நிரம்பிவிட்டது (4 பேர்)");return;}
+  var pid=newPid();
+  return dbReq("PUT","/rooms/"+code+"/players/"+pid,{name:myName(),joined:Date.now()}).then(function(){enterRoom(code,pid,false);});
+ }).catch(function(){toast("சேர முடியவில்லை. Internet சரிபார்க்கவும்");});
+}
+$("createBtn").onclick=function(){audio();createRoom(0);};
+$("joinBtn").onclick=function(){audio();joinRoom($("joinCode").value);};
+
+function enterRoom(code,pid,isHost){
+ stopO();
+ O={code:code,pid:pid,isHost:isHost,room:null,qs:null,qIdx:-1,answered:false,startTs:0,streak:0,wrongs:[],advancing:false,done:false,myPts:{},secs:15,mult:1};
+ show("olobby");
+ oPoll=setInterval(pollRoom,1200);pollRoom();
+}
+function stopO(){if(oPoll){clearInterval(oPoll);oPoll=null;}if(oTick){clearInterval(oTick);oTick=null;}oBusy=false;}
+function leaveOnline(){
+ if(!O)return;var o=O;stopO();O=null;
+ try{
+  if(o.isHost&&!o.done)dbReq("DELETE","/rooms/"+o.code).catch(function(){});
+  else if(!o.isHost&&o.room&&o.room.status==="lobby")dbReq("DELETE","/rooms/"+o.code+"/players/"+o.pid).catch(function(){});
+ }catch(e){}
+}
+function pollRoom(){
+ if(!O||oBusy)return;oBusy=true;var code=O.code;
+ dbReq("GET","/rooms/"+code).then(function(r){oBusy=false;if(!O||O.code!==code)return;handleRoom(r);}).catch(function(){oBusy=false;});
+}
+function handleRoom(r){
+ if(!r){if(!O.done){toast("Room மூடப்பட்டது");stopO();O=null;renderHome();show("home");}return;}
+ O.room=r;O.secs=DIFF[r.diff].secs;O.mult=DIFF[r.diff].mult;
+ if(r.status==="lobby"){
+  if(!r.players||!r.players[O.pid]){toast("Room-ல் இருந்து நீக்கப்பட்டீர்கள்");stopO();O=null;renderHome();show("home");return;}
+  renderLobby(r);
+ } else if(r.status==="playing"){
+  if(!O.qs)buildOQs(r);
+  if(O.qIdx!==r.q)startOQ(r.q);else updateOBoard();
+  hostAdvance();
+ } else if(r.status==="done"){
+  if(!O.done)finishOnline(r);
+ }
+}
+function renderLobby(r){
+ if($("olobby").classList.contains("hidden"))show("olobby");
+ $("olCode").textContent=O.code;
+ $("olInfo").textContent=catInfo(r.cat).icon+" "+catInfo(r.cat).label+" • "+DIFF[r.diff].label+" • "+r.size+" கேள்விகள்";
+ var box=$("olPlayers");box.innerHTML="";
+ var ids=Object.keys(r.players||{}).sort(function(a,b){return r.players[a].joined-r.players[b].joined;});
+ ids.forEach(function(id){
+  var row=mk("div","lb-row"+(id===O.pid?" me":""));row.appendChild(mk("div","lb-rank",id===r.host?"👑":"🎮"));
+  row.appendChild(mk("div","lb-name",String(r.players[id].name||"Player").slice(0,15)+(id===O.pid?" (நீங்கள்)":"")));box.appendChild(row);
+ });
+ $("olStart").classList.toggle("hidden",!O.isHost);$("olStart").disabled=ids.length<2;
+ $("olWait").textContent=O.isHost?(ids.length<2?"குறைந்தது ஒரு நண்பர் சேர வேண்டும் ("+ids.length+"/4)":ids.length+"/4 பேர் தயார்!"):"Host ஆட்டத்தைத் தொடங்கக் காத்திருக்கிறோம்… ("+ids.length+"/4)";
+}
+$("olStart").onclick=function(){
+ if(!O||!O.isHost)return;var r=O.room;
+ var items=pickItems(r.cat,r.size);
+ $("olStart").disabled=true;
+ dbReq("PATCH","/rooms/"+O.code,{status:"playing",qids:items.map(function(i){return i.id;}),q:0}).catch(function(){toast("தொடங்க முடியவில்லை");$("olStart").disabled=false;});
+};
+$("olLeave").onclick=function(){leaveOnline();renderHome();show("home");};
+$("olShare").onclick=function(){
+ if(!O)return;var url=location.href.split("#")[0]+"#room="+O.code;
+ var text="🎮 NEON QUIZ BATTLE — Online Room\nCode: "+O.code+"\nJoin: "+url;
+ if(navigator.share)navigator.share({text:text}).catch(function(){});else window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");
+};
+
+function buildOQs(r){
+ O.qs=(r.qids||[]).map(function(id,i){var p=String(id).split(":");return prep({id:id,cat:p[0],x:QUIZ[p[0]][parseInt(p[1],10)]},mulberry(hash(O.code+":"+i)));});
+}
+function oTimeLeft(){return O.secs-(Date.now()-O.startTs)/1000;}
+function startOQ(idx){
+ if(oTick){clearInterval(oTick);oTick=null;}
+ if(!O.qs||!O.qs[idx])return;
+ O.qIdx=idx;O.answered=false;O.startTs=Date.now();O.lastTick=-1;
+ var q=O.qs[idx];show("ogame");
+ $("ogCat").textContent=catInfo(O.room.cat).icon+" "+catInfo(O.room.cat).label.toUpperCase();
+ $("ogQ").textContent="Q "+(idx+1)+" / "+O.qs.length;
+ $("ogText").textContent=q.q;$("ogFb").textContent="";$("ogStatus").textContent="";
+ var a=$("ogAnswers");a.innerHTML="";
+ q.opts.forEach(function(o,i){var b=mk("button","answer",String.fromCharCode(65+i)+". "+o.t);b.onclick=function(){oAnswer(i);};a.appendChild(b);});
+ oTickFn();oTick=setInterval(oTickFn,100);updateOBoard();
+}
+function oTickFn(){
+ if(!O||O.qIdx<0)return;var r=oTimeLeft(),tl=Math.max(0,Math.ceil(r));
+ $("ogTimer").textContent="⏱ "+tl+"s";$("ogTimer").classList.toggle("danger",r<=5);
+ var b=$("ogBar");b.style.width=Math.max(0,Math.min(100,r/O.secs*100))+"%";b.classList.toggle("danger",r<=5);
+ if(!O.answered&&r<=3&&r>0&&tl!==O.lastTick){O.lastTick=tl;sfx("tick");}
+ if(r<=0&&!O.answered)oAnswer(-1);
+}
+function oAnswer(i){
+ if(!O||O.answered)return;O.answered=true;
+ var q=O.qs[O.qIdx],bs=$("ogAnswers").getElementsByTagName("button"),rem=oTimeLeft(),idx=O.qIdx;
+ var ok=i>=0&&q.opts[i].ok,pts=0;
+ for(var k=0;k<bs.length;k++){bs[k].disabled=true;if(q.opts[k].ok)bs[k].classList.add("correct");}
+ if(ok){
+  O.streak++;var speed=Math.round(Math.max(0,Math.min(1,rem/O.secs))*10),sb=O.streak>=2?Math.min(O.streak-1,5)*2:0;
+  pts=Math.round((10+speed+sb)*O.mult);
+  $("ogFb").textContent="⚡ CORRECT! +"+pts+(O.streak>=2?"  🔥 x"+O.streak:"");$("ogFb").style.color="#00ffad";sfx("correct");
+ } else {
+  O.streak=0;if(i>=0)bs[i].classList.add("wrong");
+  O.wrongs.push({q:q.q,yours:i>=0?q.opts[i].t:"⏰ Time up",right:q.answer});
+  $("ogFb").textContent=i>=0?"✖ WRONG! Answer: "+q.answer:"⏰ TIME UP! Answer: "+q.answer;$("ogFb").style.color="#ff789d";sfx("wrong");buzz(200);
+ }
+ O.myPts[idx]=pts;
+ var send=function(n){dbReq("PUT","/rooms/"+O.code+"/answers/q"+idx+"/"+O.pid,{i:i,pts:pts}).catch(function(){if(n<3&&O)setTimeout(function(){send(n+1);},800);});};
+ send(0);updateOBoard();
+}
+function oTotals(){
+ var r=O.room,t={};Object.keys(r.players||{}).forEach(function(id){t[id]=0;});
+ var ans=r.answers||{};
+ Object.keys(ans).forEach(function(qk){var a=ans[qk]||{};Object.keys(a).forEach(function(id){if(t.hasOwnProperty(id)&&a[id]&&typeof a[id].pts==="number"&&a[id].pts>=0&&a[id].pts<=200)t[id]+=a[id].pts;});});
+ var mine=0;Object.keys(O.myPts).forEach(function(k){mine+=O.myPts[k];});
+ if(t.hasOwnProperty(O.pid)&&mine>t[O.pid])t[O.pid]=mine;
+ return t;
+}
+function updateOBoard(){
+ if(!O||!O.room)return;var r=O.room,t=oTotals(),ids=Object.keys(t).sort(function(a,b){return t[b]-t[a];});
+ var cur=(r.answers&&r.answers["q"+O.qIdx])||{};if(O.answered&&!cur[O.pid])cur=Object.assign({},cur,(function(){var o={};o[O.pid]=1;return o;})());
+ var box=$("ogBoard");box.innerHTML="";
+ ids.forEach(function(id,i){
+  var row=mk("div","lb-row"+(id===O.pid?" me":""));row.appendChild(mk("div","lb-rank",String(i+1)));
+  row.appendChild(mk("div","lb-name",String(r.players[id].name||"Player").slice(0,15)+(cur[id]?"  ✅":"  ⏳")));
+  var p=mk("div","lb-pts",String(t[id]));p.appendChild(mk("small","","points"));row.appendChild(p);box.appendChild(row);
+ });
+ $("ogScore").textContent="⭐ "+t[O.pid];
+ if(O.answered){var n=ids.length,c=Object.keys(cur).length;$("ogStatus").textContent=c>=n?"அனைவரும் பதிலளித்துவிட்டனர்! அடுத்த கேள்வி…":"⏳ மற்றவர்களுக்காக காத்திருக்கிறோம்… ("+c+"/"+n+")";}
+}
+function hostAdvance(){
+ if(!O||!O.isHost||O.advancing||O.qIdx!==O.room.q||!O.answered&&(Date.now()-O.startTs)/1000<=O.secs+8)return;
+ var r=O.room,ans=(r.answers&&r.answers["q"+r.q])||{},n=Object.keys(r.players).length,cnt=Object.keys(ans).length;
+ var over=(Date.now()-O.startTs)/1000>O.secs+8;
+ if(!(cnt>=n||over))return;
+ O.advancing=true;var code=O.code,q=r.q,last=q>=O.qs.length-1;
+ setTimeout(function(){
+  if(!O||O.code!==code){return;}
+  var pr=last?dbReq("PATCH","/rooms/"+code,{status:"done"}):dbReq("PUT","/rooms/"+code+"/q",q+1);
+  pr.then(function(){if(O)O.advancing=false;}).catch(function(){if(O)O.advancing=false;});
+ },2500);
+}
+$("ogQuit").onclick=function(){if(window.confirm("Game-ஐ விட்டு வெளியேறவா?")){leaveOnline();renderHome();show("home");}};
+
+function finishOnline(r){
+ O.done=true;stopO();
+ var t=oTotals(),ids=Object.keys(t).sort(function(a,b){return t[b]-t[a];}),med=["🥇","🥈","🥉","4️⃣"];
+ var top=t[ids[0]],winners=ids.filter(function(id){return t[id]===top;}),iWon=winners.indexOf(O.pid)>=0&&winners.length===1;
+ var mine=t[O.pid],total=O.qs.length,correct=total-O.wrongs.length;
+ $("resTitle").textContent=winners.length>1?"🤝 DRAW!":"🏆 "+String(r.players[ids[0]].name).slice(0,15)+" WINS!";
+ $("resScore").textContent=String(top);$("resMsg").textContent=iWon?"நீங்கள் தான் சாம்பியன்! 🎉":"நல்ல போட்டி! அடுத்த முறை வெல்லுங்கள் 💪";
+ var st=$("resStats");st.innerHTML="";
+ [[correct+"/"+total,"Correct"],[mine,"Your points"],["#"+(ids.indexOf(O.pid)+1),"Rank"]].forEach(function(s){var d=mk("div","stat");d.appendChild(mk("b","",String(s[0])));d.appendChild(mk("span","",s[1]));st.appendChild(d);});
+ var ex=$("resExtra");ex.innerHTML="";
+ ids.forEach(function(id,i){var row=mk("div","lb-row"+(i<3?" t"+(i+1):"")+(id===O.pid?" me":""));row.appendChild(mk("div","lb-rank",med[i]||String(i+1)));row.appendChild(mk("div","lb-name",String(r.players[id].name||"Player").slice(0,15)));var p=mk("div","lb-pts",String(t[id]));p.appendChild(mk("small","","points"));row.appendChild(p);ex.appendChild(row);});
+ var rv=$("review");rv.innerHTML="";
+ if(O.wrongs.length){rv.appendChild(mk("div","lab","📝 REVIEW ("+O.wrongs.length+")"));O.wrongs.forEach(function(w){var d=mk("div","rv",w.q);d.appendChild(mk("small","","நீங்கள்: "+w.yours));d.appendChild(mk("small","","✔ சரியான பதில்: "+w.right));rv.appendChild(d);});}
+ $("againBtn").classList.add("hidden");
+ P.games++;P.xp+=mine;P.points+=mine;P.online=(P.online||0)+1;if(iWon)P.wins=(P.wins||0)+1;saveP();
+ lastResult={text:"🌐 NEON QUIZ BATTLE — Online\n"+(iWon?"நான் வென்றேன்! 🏆 ":"")+mine+" points. Can you beat me?"};
+ lastCfg={mode:"solo",cat:r.cat};
+ sfx(iWon?"win":"correct");if(iWon)confetti();
+ var isHost=O.isHost,code=O.code;O=null;
+ if(isHost)setTimeout(function(){dbReq("DELETE","/rooms/"+code).catch(function(){});},8000);
+ show("result");
+}
+
+/* invite link: #room=1234 */
+(function(){var m=/room=(\d{4})/.exec(location.hash||"");if(m&&DB_URL){openOnline();$("joinCode").value=m[1];toast("Room "+m[1]+" — பெயரை உள்ளிட்டு JOIN அழுத்துங்கள்");}})();
+
+renderHome();
+})();
+</script>
+</body>
+</html>
